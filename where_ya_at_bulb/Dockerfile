@@ -18,5 +18,3 @@ WORKDIR /app
 COPY app /app
 
 EXPOSE 8099
-
-CMD ["/usr/bin/python3", "-m", "server"]
