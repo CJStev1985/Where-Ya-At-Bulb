@@ -20,6 +20,7 @@
       .hint { color: #b8b8b8; font-size: 13px; margin-top: 6px; }
       .stack { display: grid; gap: 8px; }
       .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: center; }
+      textarea { width: 520px; max-width: 100%; padding: 10px; background: #0f0f0f; color: #ffffff; border: 1px solid #555; border-radius: 8px; }
     </style>
   </head>
   <body>
@@ -60,14 +61,28 @@
         <input type="text" name="shopping_prefix" value="{{ cfg.get('shopping_prefix','shopping_') }}" />
         <div class="hint">Any zone state starting with this prefix will map to SHOPPING.</div>
 
+        <h2>Govee Effects (optional)</h2>
+        <div class="hint">Paste the light's effect_list here once (comma-separated). Then choose effects per mode using the dropdown/autocomplete below.</div>
+        <label>Available effects (comma-separated)</label>
+        <textarea name="effects_csv" rows="4" placeholder="Adventure Game, Aurora, Rainbow, ...">{{ (cfg.get('effects') or []) | join(', ') }}</textarea>
+
+        <datalist id="effectsList">
+          {% for eff in (cfg.get('effects') or []) %}
+            <option value="{{ eff }}"></option>
+          {% endfor %}
+        </datalist>
+
         <h2>Mode Lighting</h2>
-        <div class="hint">Pick a color (or use a preset). Brightness is optional; leave it blank to avoid changing brightness.</div>
+        <div class="hint">Pick a color (or use a preset). Brightness is optional; leave it blank to avoid changing brightness. If your light supports effects, you can also set an effect by name.</div>
 
         <div class="modegrid">
           {% for mode in ['HOME','WORK','FLORIDA','SHOPPING','TRAVELING','UNKNOWN'] %}
           <div class="mode">
             <div><strong>{{ mode }}</strong></div>
             <div class="stack">
+              <label>Effect (optional)</label>
+              <input type="text" list="effectsList" name="{{ mode|lower }}_effect" value="{{ (cfg.get('colors',{}).get(mode,{}) or {}).get('effect','') }}" placeholder="e.g. Rainbow" />
+
               <label>Color</label>
               <div class="row2">
                 <select data-mode="{{ mode|lower }}" class="preset">

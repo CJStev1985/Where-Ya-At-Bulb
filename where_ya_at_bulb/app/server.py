@@ -42,6 +42,14 @@ def _save_user_config(cfg: dict) -> None:
     p.write_text(json.dumps(cfg, indent=2), encoding="utf-8")
 
 
+def _parse_csv_list(value: object) -> list[str]:
+    if value in (None, ""):
+        return []
+    s = str(value)
+    parts = [p.strip() for p in s.split(",")]
+    return [p for p in parts if p]
+
+
 def _packages_enabled(config_dir: Path) -> tuple[bool, str | None]:
     configuration_yaml = config_dir / "configuration.yaml"
     if not configuration_yaml.exists():
@@ -136,6 +144,13 @@ def _parse_brightness(value: object) -> int | None:
     if value in (None, ""):
         return None
     return int(value)
+
+
+def _parse_effect(value: object) -> str | None:
+    if value in (None, ""):
+        return None
+    s = str(value).strip()
+    return s or None
 
 
 def _build_package_yaml(options: dict, user_cfg: dict) -> str:
@@ -260,12 +275,15 @@ def _build_package_yaml(options: dict, user_cfg: dict) -> str:
             cfg_mode = colors.get(mode, {})
             rgb = _mode_rgb(cfg_mode)
             bri = _parse_brightness(cfg_mode.get("brightness"))
+            eff = _parse_effect(cfg_mode.get("effect"))
 
             light_data: dict = {}
             if rgb:
                 light_data["rgb_color"] = rgb
             if bri is not None:
                 light_data["brightness"] = bri
+            if eff:
+                light_data["effect"] = eff
 
             if not light_data:
                 continue
@@ -362,13 +380,38 @@ def save():
         "shopping_prefix": form.get("shopping_prefix", "shopping_").strip(),
         "zones_florida": [z.strip() for z in form.get("zones_florida", "").split(",") if z.strip()],
         "flourish_enabled": form.get("flourish_enabled") == "on",
+        "effects": _parse_csv_list(form.get("effects_csv", "")),
         "colors": {
-            "HOME": {"hex": form.get("home_color", "").strip(), "brightness": form.get("home_brightness", "").strip()},
-            "WORK": {"hex": form.get("work_color", "").strip(), "brightness": form.get("work_brightness", "").strip()},
-            "FLORIDA": {"hex": form.get("florida_color", "").strip(), "brightness": form.get("florida_brightness", "").strip()},
-            "SHOPPING": {"hex": form.get("shopping_color", "").strip(), "brightness": form.get("shopping_brightness", "").strip()},
-            "TRAVELING": {"hex": form.get("traveling_color", "").strip(), "brightness": form.get("traveling_brightness", "").strip()},
-            "UNKNOWN": {"hex": form.get("unknown_color", "").strip(), "brightness": form.get("unknown_brightness", "").strip()},
+            "HOME": {
+                "hex": form.get("home_color", "").strip(),
+                "brightness": form.get("home_brightness", "").strip(),
+                "effect": form.get("home_effect", "").strip(),
+            },
+            "WORK": {
+                "hex": form.get("work_color", "").strip(),
+                "brightness": form.get("work_brightness", "").strip(),
+                "effect": form.get("work_effect", "").strip(),
+            },
+            "FLORIDA": {
+                "hex": form.get("florida_color", "").strip(),
+                "brightness": form.get("florida_brightness", "").strip(),
+                "effect": form.get("florida_effect", "").strip(),
+            },
+            "SHOPPING": {
+                "hex": form.get("shopping_color", "").strip(),
+                "brightness": form.get("shopping_brightness", "").strip(),
+                "effect": form.get("shopping_effect", "").strip(),
+            },
+            "TRAVELING": {
+                "hex": form.get("traveling_color", "").strip(),
+                "brightness": form.get("traveling_brightness", "").strip(),
+                "effect": form.get("traveling_effect", "").strip(),
+            },
+            "UNKNOWN": {
+                "hex": form.get("unknown_color", "").strip(),
+                "brightness": form.get("unknown_brightness", "").strip(),
+                "effect": form.get("unknown_effect", "").strip(),
+            },
         },
     }
 
