@@ -10,6 +10,10 @@ RUN apk add --no-cache \
 
 COPY rootfs /
 
+RUN chmod +x \
+  /etc/services.d/where_ya_at_bulb/run \
+  /etc/services.d/where_ya_at_bulb/finish
+
 WORKDIR /app
 COPY app /app
 
