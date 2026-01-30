@@ -97,6 +97,41 @@ def _parse_rgb(value: object) -> list[int] | None:
     return None
 
 
+def _parse_hex_color(value: object) -> list[int] | None:
+    if not value or not isinstance(value, str):
+        return None
+
+    s = value.strip()
+    if not s:
+        return None
+    if s.startswith("#"):
+        s = s[1:]
+    if len(s) != 6:
+        return None
+    try:
+        r = int(s[0:2], 16)
+        g = int(s[2:4], 16)
+        b = int(s[4:6], 16)
+        return [r, g, b]
+    except Exception:
+        return None
+
+
+def _rgb_to_hex(rgb: list[int]) -> str:
+    r, g, b = int(rgb[0]), int(rgb[1]), int(rgb[2])
+    r = max(0, min(255, r))
+    g = max(0, min(255, g))
+    b = max(0, min(255, b))
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
+def _mode_rgb(cfg_mode: dict) -> list[int] | None:
+    rgb = _parse_rgb(cfg_mode.get("rgb"))
+    if rgb:
+        return rgb
+    return _parse_hex_color(cfg_mode.get("hex"))
+
+
 def _parse_brightness(value: object) -> int | None:
     if value in (None, ""):
         return None
@@ -223,7 +258,7 @@ def _build_package_yaml(options: dict, user_cfg: dict) -> str:
         choose_sequences: list[dict] = []
         for mode in modes:
             cfg_mode = colors.get(mode, {})
-            rgb = _parse_rgb(cfg_mode.get("rgb"))
+            rgb = _mode_rgb(cfg_mode)
             bri = _parse_brightness(cfg_mode.get("brightness"))
 
             light_data: dict = {}
@@ -299,6 +334,16 @@ def index():
     options = _get_addon_options()
     cfg = _load_user_config()
     merged = {**options, **cfg}
+    colors = merged.get("colors")
+    if isinstance(colors, dict):
+        for mode, cfg_mode in colors.items():
+            if not isinstance(cfg_mode, dict):
+                continue
+            if cfg_mode.get("hex"):
+                continue
+            rgb = _parse_rgb(cfg_mode.get("rgb"))
+            if rgb:
+                cfg_mode["hex"] = _rgb_to_hex(rgb)
     return render_template("index.html", cfg=merged)
 
 
@@ -318,12 +363,12 @@ def save():
         "zones_florida": [z.strip() for z in form.get("zones_florida", "").split(",") if z.strip()],
         "flourish_enabled": form.get("flourish_enabled") == "on",
         "colors": {
-            "HOME": {"rgb": form.get("home_rgb", "").strip(), "brightness": form.get("home_brightness", "").strip()},
-            "WORK": {"rgb": form.get("work_rgb", "").strip(), "brightness": form.get("work_brightness", "").strip()},
-            "FLORIDA": {"rgb": form.get("florida_rgb", "").strip(), "brightness": form.get("florida_brightness", "").strip()},
-            "SHOPPING": {"rgb": form.get("shopping_rgb", "").strip(), "brightness": form.get("shopping_brightness", "").strip()},
-            "TRAVELING": {"rgb": form.get("traveling_rgb", "").strip(), "brightness": form.get("traveling_brightness", "").strip()},
-            "UNKNOWN": {"rgb": form.get("unknown_rgb", "").strip(), "brightness": form.get("unknown_brightness", "").strip()},
+            "HOME": {"hex": form.get("home_color", "").strip(), "brightness": form.get("home_brightness", "").strip()},
+            "WORK": {"hex": form.get("work_color", "").strip(), "brightness": form.get("work_brightness", "").strip()},
+            "FLORIDA": {"hex": form.get("florida_color", "").strip(), "brightness": form.get("florida_brightness", "").strip()},
+            "SHOPPING": {"hex": form.get("shopping_color", "").strip(), "brightness": form.get("shopping_brightness", "").strip()},
+            "TRAVELING": {"hex": form.get("traveling_color", "").strip(), "brightness": form.get("traveling_brightness", "").strip()},
+            "UNKNOWN": {"hex": form.get("unknown_color", "").strip(), "brightness": form.get("unknown_brightness", "").strip()},
         },
     }
 
