@@ -3,8 +3,10 @@ FROM ${BUILD_FROM}
 
 ENV PYTHONUNBUFFERED=1
 
-RUN apk add --no-cache python3 py3-pip \
-  && pip3 install --no-cache-dir flask==3.0.0 pyyaml==6.0.1
+RUN apk add --no-cache \
+  python3 \
+  py3-flask \
+  py3-yaml
 
 COPY rootfs /
 
