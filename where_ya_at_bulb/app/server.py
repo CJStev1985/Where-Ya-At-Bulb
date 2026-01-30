@@ -171,7 +171,7 @@ def _build_package_yaml(options: dict, user_cfg: dict) -> str:
                 "trigger": [{"platform": "state", "entity_id": phone_tracker}],
                 "condition": [],
                 "action": [
-                    {"variables": {"candidate": "{{ " + candidate + " }}"}},
+                    {"variables": {"candidate": candidate}},
                     {
                         "choose": [
                             {
@@ -204,7 +204,7 @@ def _build_package_yaml(options: dict, user_cfg: dict) -> str:
                     }
                 ],
                 "action": [
-                    {"variables": {"candidate": "{{ " + candidate + " }}"}},
+                    {"variables": {"candidate": candidate}},
                     {
                         "condition": "template",
                         "value_template": "{{ candidate != states('" + location_mode_entity + "') }}",
