@@ -1,0 +1,29 @@
+name: "Location Lighting Mode"
+slug: location_lighting_mode
+description: "Ingress UI to generate Home Assistant packages for a location-driven lighting mode system"
+version: "0.1.0"
+url: "https://github.com/REPLACE_ME/location-lighting-mode"
+arch:
+  - aarch64
+  - armv7
+  - armhf
+  - amd64
+  - i386
+startup: services
+init: false
+ingress: true
+ingress_port: 8099
+panel_title: "Location Lighting"
+panel_icon: "mdi:lightbulb-auto"
+map:
+  - config:rw
+options:
+  package_path: "packages/location_lighting_mode_generated.yaml"
+  location_mode_entity: "input_select.location_mode"
+  manual_override_entity: "input_boolean.light_manual_override"
+  dwell_seconds: 300
+schema:
+  package_path: str
+  location_mode_entity: str
+  manual_override_entity: str
+  dwell_seconds: int(30,3600)

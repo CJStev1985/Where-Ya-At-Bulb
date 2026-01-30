@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Location Lighting Mode</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 16px; }
+      .row { display: flex; gap: 16px; flex-wrap: wrap; }
+      .card { border: 1px solid #ddd; border-radius: 10px; padding: 16px; max-width: 860px; }
+      label { display:block; font-weight: 600; margin-top: 10px; }
+      input[type=text], input[type=number] { width: 520px; max-width: 100%; padding: 8px; }
+      .small { font-weight: 500; color: #444; margin-top: 4px; }
+      button { padding: 10px 14px; font-weight: 700; }
+      .modegrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .mode { border: 1px solid #eee; border-radius: 10px; padding: 12px; }
+      .hint { color: #666; font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <h1>Location Lighting Mode</h1>
+
+    <div class="card">
+      <form method="post" action="/save">
+        <h2>Core Entities</h2>
+
+        <label>Phone tracker entity</label>
+        <input type="text" name="phone_tracker" value="{{ cfg.get('phone_tracker','') }}" placeholder="device_tracker.your_iphone" />
+        <div class="hint">This should be the device_tracker created by the Home Assistant Companion App.</div>
+
+        <label>Light entity</label>
+        <input type="text" name="light_entity" value="{{ cfg.get('light_entity','') }}" placeholder="light.your_govee_bulb" />
+
+        <label>Location mode helper</label>
+        <input type="text" name="location_mode_entity" value="{{ cfg.get('location_mode_entity','input_select.location_mode') }}" />
+
+        <label>Manual override helper</label>
+        <input type="text" name="manual_override_entity" value="{{ cfg.get('manual_override_entity','input_boolean.light_manual_override') }}" />
+
+        <label>Dwell seconds (anti-flicker)</label>
+        <input type="number" min="30" max="3600" name="dwell_seconds" value="{{ cfg.get('dwell_seconds',300) }}" />
+
+        <h2>Zones</h2>
+
+        <label>Florida zones (comma-separated)</label>
+        <input type="text" name="zones_florida" value="{{ (cfg.get('zones_florida') or []) | join(',') }}" placeholder="florida,florida_house" />
+
+        <label>Work zone</label>
+        <input type="text" name="zone_work" value="{{ cfg.get('zone_work','') }}" placeholder="work" />
+
+        <label>Airport zone (optional)</label>
+        <input type="text" name="zone_airport" value="{{ cfg.get('zone_airport','') }}" placeholder="airport" />
+
+        <label>Shopping zone prefix</label>
+        <input type="text" name="shopping_prefix" value="{{ cfg.get('shopping_prefix','shopping_') }}" />
+        <div class="hint">Any zone state starting with this prefix will map to SHOPPING.</div>
+
+        <h2>Mode Lighting (RGB and optional brightness 1-255)</h2>
+        <div class="hint">RGB format: 255,0,128</div>
+
+        <div class="modegrid">
+          {% for mode in ['HOME','WORK','FLORIDA','SHOPPING','TRAVELING','UNKNOWN'] %}
+          <div class="mode">
+            <div><strong>{{ mode }}</strong></div>
+            <label>RGB</label>
+            <input type="text" name="{{ mode|lower }}_rgb" value="{{ (cfg.get('colors',{}).get(mode,{}) or {}).get('rgb','') }}" />
+            <label>Brightness</label>
+            <input type="number" min="1" max="255" name="{{ mode|lower }}_brightness" value="{{ (cfg.get('colors',{}).get(mode,{}) or {}).get('brightness','') }}" />
+          </div>
+          {% endfor %}
+        </div>
+
+        <h2>Optional Flourish</h2>
+        <label>
+          <input type="checkbox" name="flourish_enabled" {% if cfg.get('flourish_enabled') %}checked{% endif %} />
+          Enable a short flourish the first time HOME triggers each day
+        </label>
+
+        <div style="margin-top: 16px" class="row">
+          <button type="submit">Save</button>
+        </div>
+      </form>
+
+      <form method="post" action="/apply" style="margin-top: 12px">
+        <button type="submit">Apply (Generate YAML)</button>
+      </form>
+
+      <div class="hint" style="margin-top: 10px;">
+        Output file: /config/{{ cfg.get('package_path','packages/location_lighting_mode_generated.yaml') }}
+      </div>
+    </div>
+  </body>
+</html>
