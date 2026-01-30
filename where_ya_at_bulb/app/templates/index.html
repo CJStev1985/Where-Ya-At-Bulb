@@ -5,15 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Where-Ya-At Bulb</title>
     <style>
-      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 16px; }
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 16px; color: #f5f5f5; }
       .row { display: flex; gap: 16px; flex-wrap: wrap; }
-      .card { border: 1px solid #ddd; border-radius: 10px; padding: 16px; max-width: 860px; }
-      label { display:block; font-weight: 600; margin-top: 10px; }
-      input[type=text], input[type=number] { width: 520px; max-width: 100%; padding: 8px; }
-      button { padding: 10px 14px; font-weight: 700; }
+      .card { border: 1px solid #3a3a3a; border-radius: 10px; padding: 16px; max-width: 860px; background: rgba(20, 20, 20, 0.85); }
+      label { display:block; font-weight: 650; margin-top: 10px; color: #f5f5f5; }
+      input[type=text], input[type=number] { width: 520px; max-width: 100%; padding: 10px; background: #0f0f0f; color: #ffffff; border: 1px solid #555; border-radius: 8px; }
+      input::placeholder { color: #8f8f8f; }
+      button { padding: 10px 14px; font-weight: 800; background: #2f6fed; color: #fff; border: 0; border-radius: 10px; cursor: pointer; }
+      button:hover { background: #245bd0; }
       .modegrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-      .mode { border: 1px solid #eee; border-radius: 10px; padding: 12px; }
-      .hint { color: #666; font-size: 13px; margin-top: 6px; }
+      .mode { border: 1px solid #3a3a3a; border-radius: 10px; padding: 12px; background: rgba(0, 0, 0, 0.25); }
+      .hint { color: #b8b8b8; font-size: 13px; margin-top: 6px; }
     </style>
   </head>
   <body>
