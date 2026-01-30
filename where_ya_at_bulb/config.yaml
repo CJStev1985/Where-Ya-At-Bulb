@@ -1,7 +1,7 @@
 name: "Where-Ya-At Bulb"
 slug: where_ya_at_bulb
 description: "Ingress UI to generate Home Assistant packages for a location-driven lighting mode system"
-version: "0.1.2"
+version: "0.1.3"
 url: "https://github.com/CJStev1985/Where-Ya-At-Bulb"
 arch:
   - aarch64
