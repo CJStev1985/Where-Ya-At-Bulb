@@ -1,3 +1,4 @@
 #!/usr/bin/with-contenv bashio
 
+cd /app
 exec /usr/bin/python3 -m app.server
