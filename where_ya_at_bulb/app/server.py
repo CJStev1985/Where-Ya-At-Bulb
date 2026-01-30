@@ -61,30 +61,28 @@ def _candidate_template(user_cfg: dict) -> str:
     zone_airport = (user_cfg.get("zone_airport") or "").strip()
     shopping_prefix = (user_cfg.get("shopping_prefix") or "shopping_").strip()
 
-    florida_list = ", ".join(["'" + z + "'" for z in zones_florida])
+    loc_expr = "states('" + phone_tracker + "')"
 
     parts: list[str] = []
-    parts.append("{% set loc = states('" + phone_tracker + "') %}")
-
     if zones_florida:
-        parts.append("{% if loc in [" + florida_list + "] %}FLORIDA")
-    else:
-        parts.append("{% if false %}FLORIDA")
+        florida_list = ", ".join(["'" + z + "'" for z in zones_florida])
+        parts.append("'FLORIDA' if " + loc_expr + " in [" + florida_list + "] else ")
 
     if zone_work:
-        parts.append("{% elif loc == '" + zone_work + "' %}WORK")
+        parts.append("'WORK' if " + loc_expr + " == '" + zone_work + "' else ")
 
-    parts.append("{% elif loc == 'home' %}HOME")
+    parts.append("'HOME' if " + loc_expr + " == 'home' else ")
 
     if zone_airport:
-        parts.append("{% elif loc == '" + zone_airport + "' %}TRAVELING")
+        parts.append("'TRAVELING' if " + loc_expr + " == '" + zone_airport + "' else ")
 
     if shopping_prefix:
-        parts.append("{% elif loc.startswith('" + shopping_prefix + "') %}SHOPPING")
+        parts.append("'SHOPPING' if " + loc_expr + ".startswith('" + shopping_prefix + "') else ")
 
-    parts.append("{% else %}UNKNOWN{% endif %}")
+    parts.append("'UNKNOWN'")
 
-    return "\n".join(parts)
+    expr = "".join(parts)
+    return "{{ (" + expr + ") | trim }}"
 
 
 def _parse_rgb(value: object) -> list[int] | None:
