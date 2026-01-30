@@ -19,4 +19,4 @@ COPY app /app
 
 EXPOSE 8099
 
-CMD ["/usr/bin/python3", "-m", "app.server"]
+CMD ["/usr/bin/python3", "-m", "server"]
